@@ -1,4 +1,4 @@
-# HF-Advance
+why# HF-Advance
 
 ## Tools
 
@@ -30,7 +30,7 @@ Import the `.elf` file in your reverse engineering tool of choice. I prefer Ghid
 
 ![Locksmith Task](images/locksmith-task.png)
 
-Let's find a way to move your character to the key.
+Let's find a way to move the character to the key.
 
 The character data lives on stack as `main_character` in the `main` function.
 
@@ -62,7 +62,7 @@ int main(void)
 }
 ```
 
-Let's use `move_main_character` as it only has one parameter. From `Ghidra`, note the starting address of `0x80004f0` and that register `r0` hold pointer to `main_character`. 
+Let's use `move_main_character` as it only has one parameter. From `Ghidra`, note the starting address of `0x80004f0` and that register `r0` holds the pointer to `main_character`. 
 
 ![move_main_character](images/move_main_character.png)
 
@@ -75,13 +75,13 @@ continue
 
 ![Player Pointer](images/player_pointer.png)
 
-This address will remain the same between executions, so keep note of it.
+This address will remain the same between executions, so you can write it down to use later.
 
 From `Ghidra`, let's view the structure of the `main_character`, which has symbols for the `MAIN_CHARACTER` structure.
 
 ![main_character](images/main_character.png)
 
-`objAttr` doesn't really mean much to us but `x`, `y`, `scroll_x`, and `scroll_y` are interesting. Let's dump their values in `mGBA`'s debugger.
+`objAttr` doesn't really matter for us but `x`, `y`, `scroll_x`, and `scroll_y` are interesting. Let's dump their values in `mGBA`'s debugger.
 
 ```c
 // x
@@ -103,7 +103,7 @@ continue
 
 If the `main_character` moves, the data updates. This must be the `main_character`.
 
-Let's update the player's position in `mGBA`'s debugger to key. This can be done in trial and error fashion, but for convenience, these are the "best" values.
+Let's update the player's position in `mGBA`'s debugger to key. This can be done in trial and error fashion. For convenience, these are the "best" values.
 
 ```c
 // scroll_x
@@ -161,7 +161,7 @@ watch/w 0x3004598
 continue
 ```
 
-Pressing the GBA's `start` button (keyboard `Enter`), this will trigger change the state to `1`.
+Pressing the GBA's `start` button (keyboard `Enter`), will change the state to `1`.
 
 ![State 1](images/state_1.png)
 
@@ -175,7 +175,7 @@ To prevent the `watchpoint` to trigger over and over, it can be deleted using it
 delete 2
 ```
 
-This was all quite useful, but it might be better to control this directly from the debugger. The state can be updated to `1` with the following.
+This was one way of changing the state, but it might be better to control this directly from the debugger. The state can be updated to `1` with the following.
 
 ```c
 w/1 0x3004598 1
@@ -208,7 +208,7 @@ void process_cheat_codes(void)
 }
 ```
 
-The code stores the keys (aka buttons) pressed and compares them to the `flag2_cheat` buffer. By double clicking `flag2_cheat`, the button data is displayed.
+The code stores the keys (aka buttons) pressed and compares them to the `flag2_cheat` array. By double clicking `flag2_cheat`, the button data is displayed.
 
 ![Cheat Button](images/cheat_buttons.png)
 
@@ -227,7 +227,7 @@ Looking online, there are multiple places that has documentation about what the 
 #define KEY_L        0x0200
 ```
 
-Using this table, translate the keys from the game data.
+Using this table, translate the keys from the button array.
 
 ```
 DOWN
@@ -252,7 +252,7 @@ In `Tools > Settings > Keyboard`, check the key mapping to correctly input the b
 
 ![Buttons](images/buttons.png)
 
-When ready, reset the game (to make sure the input buffer is cleared) and enter the input in the pause menu. This will confirm that the cheat is correct. 
+When ready, reset the game (to make sure the input buffer is cleared) and enter the buttons in the pause menu. A map will appear to confirm that the cheat is correct. 
 
 ![Flag 2](images/flag2.png)
 
@@ -266,7 +266,7 @@ HF-DOWNDOWNABABLEFTUPRIGHTLEFTUPRIGHTLRSELECTSELECT
 
 ![Inception](images/inception.png)
 
-As `Rastislonge` mentions, there is a `.sav` generated. Let's check what type of data this is.
+As `Rastislonge` mentions, there is a `.sav` generated. Let's check what type of data the save is.
 
 ```bash
 $ file dax-hf2024-gba.sav
@@ -274,7 +274,7 @@ $ file dax-hf2024-gba.sav
 dax-hf2024-gba.sav: Game Boy Advance ROM image: "DEEP" (000000, Rev.00)
 ```
 
-As the challenge name hints, the game is a gameboy game too! Rename the `.sav` to `.gba` and run the game.
+As the challenge name hints, the save is a gameboy game too! Rename the `.sav` to `.gba` and run the game.
 
 ![Flag 3](images/flag3.png)
 
@@ -331,13 +331,13 @@ Two breakpoints will be hit. For the first, set the value of the timer. This reg
 w/r r2 0xFFFFFFFE
 ```
 
-For the second, override the value of the timer to the original value of `0xC7C0`.
+For the second, change the value of the timer back to the original value of `0xC7C0`.
 
 ```
 w/r r3 0xC7C0
 ```
 
-It is important these are set these correctly because the flag is generated by XORing these values.
+It is important to set these correctly because the flag is generated by XORing the timer values.
 
 ![Flag 4](images/flag4.png)
 
@@ -375,7 +375,7 @@ void check_toggle_switch(MAIN_CHARACTER *main_character)
 
 ### Lazy (My Solve)
 
-I didn't feel like understanding the conditions, so I just skipped it. This can be done by switching the program counter (`pc`) on the first branch check at `0x8000a06`.
+I didn't feel like understanding the conditions, so I just skipped it. This can be done by moving the program counter (`pc`) on the first branch check at `0x8000a06`.
 
 ![Branch](images/check_toggle_switch.png)
 
@@ -481,7 +481,7 @@ This should give the following values.
 00008673
 ```
 
-Using [this documentation](http://www.belogic.com/gba/registers.shtml#REG_SOUND1CNT_X), it lets us know the formula to convert the data to frequency is the following.
+Using [this documentation](http://www.belogic.com/gba/registers.shtml#REG_SOUND1CNT_X), we find the formula to convert the data to frequencies is the following.
 
 ```
 F(hz) = 4194304/(32*(2048-X))
@@ -592,4 +592,4 @@ For being the first to solve the whole track, I got a fun exclusive prize (1/3).
 
 ![Prize](images/prize.jpg)
 
-Thanks [@dax](daxAKAhackerman) for the great track!
+Thanks [@dax](https://github.com/daxAKAhackerman) for the great track!
