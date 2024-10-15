@@ -588,7 +588,7 @@ HF-8271835581908094
 
 ## Fin
 
-For being the first (and I think, only one) to solve the whole track, I got a fun exclusive prize.
+For being the first to solve the whole track, I got a fun exclusive prize (1/3).
 
 ![Prize](images/prize.jpg)
 
