@@ -197,7 +197,7 @@ Given we proved we can redirect control flow by ovewriting the return, this is a
 
 The program has two useful gadgets for us. We have a call to `system` from `testsystem` and a `POP RDI` in `popopops`. [From documentation](https://man7.org/linux/man-pages/man3/system.3.html), we see `system` only takes one arguments and for `x86_64` this the first argument is usually `RDI`.
 
-We would want `RDI` to be `/bin/sh` (to have a full remote shell). There is no easy access to `/bin/sh`, but we can add one ourselves by adding to end of our `ROP` payload. We'd also need a stack address, which luckily we can leak with `%10$p~` `printf` format.
+We would want `RDI` to be `/bin/sh` (to have a full remote shell). ~~There is no easy access to `/bin/sh`, but we can add one ourselves by adding to end of our `ROP` payload. We'd also need a stack address, which luckily we can leak with `%10$p~` `printf` format.~~ (There is a `/bin/sh` in a message that can be used instead. This is much easier than finding an offset on stack like this, but this is the way I solved it).
 
 We can edit the script from flag 2 to get the final full RCE payload.
 
